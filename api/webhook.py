@@ -1,4 +1,5 @@
 import os
+import sys
 import telebot
 import requests
 from http.server import BaseHTTPRequestHandler
@@ -10,6 +11,7 @@ bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
+    print(f"HANDLER TRIGGERED: {message.text}", flush=True)
     user_text = message.text
 
     headers = {
@@ -29,22 +31,32 @@ def handle_message(message):
             headers=headers,
             timeout=25
         )
+        print(f"AI Status: {response.status_code}", flush=True)
         response.raise_for_status()
         ai_reply = response.json()["choices"][0]["message"]["content"]
     except Exception as e:
         ai_reply = "Sorry, I encountered an error talking to the AI service."
-        print(f"Error: {e}")
+        print(f"AI Error: {e}", flush=True)
 
     bot.reply_to(message, ai_reply)
+    print("Reply sent", flush=True)
 
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        update = telebot.types.Update.de_json(post_data.decode('utf-8'))
-        bot.process_new_updates([update])
+        try:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            print(f"RAW UPDATE: {post_data.decode('utf-8')}", flush=True)
 
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b'OK')
+            update = telebot.types.Update.de_json(post_data.decode('utf-8'))
+            bot.process_new_updates([update])
+
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b'OK')
+        except Exception as e:
+            print(f"WEBHOOK ERROR: {e}", flush=True)
+            self.send_response(200)  # still return 200 so Telegram doesn't retry endlessly
+            self.end_headers()
+            self.wfile.write(b'Error logged')
