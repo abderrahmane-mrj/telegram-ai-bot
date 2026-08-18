@@ -7,7 +7,7 @@ print("DEPLOYMENT CHECK: httpx version test v2", flush=True)
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 INCEPTION_API_KEY = os.environ["INCEPTION_API_KEY"]
 
-bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
+bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN, threaded=False)
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
