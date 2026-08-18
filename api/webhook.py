@@ -82,6 +82,7 @@ class handler(BaseHTTPRequestHandler):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             update = telebot.types.Update.de_json(post_data.decode('utf-8'))
+            print(f"INCOMING TELEGRAM UPDATE: {post_data.decode('utf-8')}", flush=True)
             bot.process_new_updates([update])
 
             self.send_response(200)
