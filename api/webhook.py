@@ -21,7 +21,7 @@ def ask_ai(user_text):
     }
     with httpx.Client(timeout=25) as client:
         response = client.post(
-            "https://api.ecomagent.in/v1",
+            "https://api.inceptionlabs.ai/v1/chat/completions",
             json=payload,
             headers=headers
         )
