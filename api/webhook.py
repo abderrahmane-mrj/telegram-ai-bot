@@ -25,7 +25,9 @@ def handle_message(message):
     }
 
     try:
-        response = requests.post(
+        session = requests.Session()
+        session.mount('https://', requests.adapters.HTTPAdapter(max_retries=3))
+        response = session.post(
             "https://api.inceptionlabs.ai/v1/chat/completions",
             json=payload,
             headers=headers,
