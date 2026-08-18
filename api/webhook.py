@@ -43,7 +43,6 @@ def handle_text(message):
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     print("HANDLER TRIGGERED (photo)", flush=True)
-    caption = message.caption or ""
     bot.reply_to(message, "📷 I received your photo, but I can't analyze images yet — only text. Feel free to describe what's in it and I'll help with that!")
 
 
@@ -71,4 +70,25 @@ def handle_sticker(message):
     bot.reply_to(message, "😄 Nice sticker! I can only respond to text messages for now.")
 
 
-@bot.message
+@bot.message_handler(content_types=['audio'])
+def handle_audio(message):
+    print("HANDLER TRIGGERED (audio)", flush=True)
+    bot.reply_to(message, "🎵 I received your audio file, but I can't process audio yet — only text for now.")
+
+
+class handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        try:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            update = telebot.types.Update.de_json(post_data.decode('utf-8'))
+            bot.process_new_updates([update])
+
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b'OK')
+        except Exception as e:
+            print(f"WEBHOOK ERROR: {e}", flush=True)
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b'Error logged')
