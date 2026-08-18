@@ -2,6 +2,7 @@ import os
 import telebot
 import httpx
 from http.server import BaseHTTPRequestHandler
+print("DEPLOYMENT CHECK: httpx version test v2", flush=True)
 
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 INCEPTION_API_KEY = os.environ["INCEPTION_API_KEY"]
