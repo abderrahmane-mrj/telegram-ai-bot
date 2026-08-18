@@ -3,8 +3,6 @@ import telebot
 import httpx
 from http.server import BaseHTTPRequestHandler
 
-print("Incoming Update:", request.json())
-
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 INCEPTION_API_KEY = os.environ["INCEPTION_API_KEY"]
 
