@@ -1,7 +1,6 @@
 import os
-import sys
 import telebot
-import requests
+import httpx
 from http.server import BaseHTTPRequestHandler
 
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
@@ -25,14 +24,12 @@ def handle_message(message):
     }
 
     try:
-        session = requests.Session()
-        session.mount('https://', requests.adapters.HTTPAdapter(max_retries=3))
-        response = session.post(
-            "https://api.inceptionlabs.ai/v1/chat/completions",
-            json=payload,
-            headers=headers,
-            timeout=25
-        )
+        with httpx.Client(timeout=25) as client:
+            response = client.post(
+                "https://api.inceptionlabs.ai/v1/chat/completions",
+                json=payload,
+                headers=headers
+            )
         print(f"AI Status: {response.status_code}", flush=True)
         response.raise_for_status()
         ai_reply = response.json()["choices"][0]["message"]["content"]
@@ -59,6 +56,6 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(b'OK')
         except Exception as e:
             print(f"WEBHOOK ERROR: {e}", flush=True)
-            self.send_response(200)  # still return 200 so Telegram doesn't retry endlessly
+            self.send_response(200)
             self.end_headers()
             self.wfile.write(b'Error logged')
